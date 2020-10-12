@@ -87,6 +87,22 @@ const setupServer = () => {
     else res.send(pokeData.attacks);
   });
 
+  app.get("/api/attacks/fast", (req, res) => {
+    if (req.query.n) {
+      res.send(pokeData.attacks.fast.slice(0, req.query.n));
+    } else {
+      res.send(pokeData.attacks.fast);
+    }
+  });
+
+  app.get("/api/attacks/special", (req, res) => {
+    if (req.query.n) {
+      res.send(pokeData.attacks.special.slice(0, req.query.n));
+    } else {
+      res.send(pokeData.attacks.special);
+    }
+  });
+
   return app;
 };
 
