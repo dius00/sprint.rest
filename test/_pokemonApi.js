@@ -3,6 +3,9 @@ const chaiHttp = require("chai-http");
 chai.use(chaiHttp);
 const { setupServer } = require("../src/server");
 chai.should();
+
+const pokeData = require("../src/data");
+
 /*
  * This sprint you will have to create all tests yourself, TDD style.
  * For this you will want to get familiar with chai-http https://www.chaijs.com/plugins/chai-http/
@@ -36,8 +39,13 @@ describe("Pokemon API Server", () => {
 
       it("should return all the evolutions for a pokemon", async () => {
         const { body } = await request.get("/api/pokemon/staryu/evolutions");
-        console.log(body);
         body.should.deep.equal([{ id: 121, name: "Starmie" }]);
+      });
+      it("should return the previous evolution of a pokemon", async () => {
+        const { body } = await request.get(
+          "/api/pokemon/17/evolutions/previous"
+        );
+        body.should.deep.equal([{ id: 16, name: "Pidgey" }]);
       });
     });
     xdescribe("POST", () => {
@@ -76,4 +84,21 @@ describe("Pokemon API Server", () => {
       });
     });
 */
+
+  describe("types", () => {
+    it("should return a list of types", async () => {
+      const { body } = await request.get("/api/types");
+      body.should.deep.equal(pokeData.types);
+    });
+    it("should return a list of all pokemon of a certain type", async () => {
+      const { body } = await request.get("/api/types/Grass/pokemon");
+      const res = [];
+      pokeData.pokemon.forEach((poke) => {
+        if (poke.types.includes("Grass")) {
+          res.push({ id: poke.id, name: poke.name });
+        }
+      });
+      body.should.deep.equal(res);
+    });
+  });
 });
