@@ -29,7 +29,7 @@ const setupServer = () => {
     const { value } = req.params;
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
-        if (poke.name === value) res.send(poke);
+        if (poke.name.toLowerCase() === value.toLowerCase()) res.send(poke);
       });
     } else {
       const pokeId = Number(value);
@@ -41,9 +41,11 @@ const setupServer = () => {
 
   app.get("/api/pokemon/:value/evolutions", (req, res) => {
     const { value } = req.params;
+    console.log(value);
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
-        if (poke.name === value) res.send(poke.evolutions);
+        if (poke.name.toLowerCase() === value.toLowerCase())
+          res.send(poke.evolutions);
       });
     } else {
       const pokeId = Number(value);
