@@ -89,25 +89,83 @@ describe("Pokemon API Server", () => {
     describe("GET", () => {
       it("should return a list of all attacks", async () => {
         const { body } = await request.get("/api/attacks");
-
         body.should.deep.equal(pokeData.attacks);
+      });
 
-        //TODO TEST FOR when limit is given
+      it("should return an n list of all attacks if an an value is given", async () => {
+        const { body } = await request.get("/api/attacks").query({
+          n: 15,
+        });
+        body.length.should.equal(15);
+      });
+
+      it("should return a list of all fast attacks", async () => {
+        const { body } = await request.get("/api/attacks/fast");
+        body.should.deep.equal(pokeData.attacks.fast);
       });
 
       it("should return a list of n fast attacks", async () => {
-        const { body } = await request.get("/api/attacks/fast");
-        body.should.deep.equal(pokeData.attacks.fast);
+        const { body } = await request.get("/api/attacks/fast").query({
+          n: 15,
+        });
+        body.length.should.equal(15);
+      });
 
-        // TODO WORK FOR A CERTAIN LIMIT
+      it("should return a list of all special attacks", async () => {
+        const { body } = await request.get("/api/attacks/special");
+        body.should.deep.equal(pokeData.attacks.special);
       });
 
       it("should return a list of n special attacks", async () => {
-        const { body } = await request.get("/api/attacks/special");
-        body.should.deep.equal(pokeData.attacks.special);
+        const { body } = await request.get("/api/attacks/special").query({
+          n: 15,
+        });
+        body.length.should.equal(15);
+      });
 
-        // TODO WORK FOR A CERTAIN LIMIT
+      it("should Get a specific attack by name, no matter if it is fast or special", async () => {
+        const { body } = await request.get("/api/attacks/Earthquake");
+        const attack = {
+          name: "Earthquake",
+          type: "Ground",
+          damage: 100,
+        };
+        body.should.deep.equal(attack);
+      });
+
+      it("should return a list of all pokemon of that have a certain attack", async () => {
+        const { body } = await request.get("/api/attacks/Earthquake/pokemon");
+        const result = [];
+        const all = pokeData.pokemon;
+        for (const poke of all) {
+          for (const fast of poke.attacks.fast) {
+            if (fast.name === "Earthquake") {
+              result.push({
+                id: poke.id,
+                name: poke.name,
+              });
+            }
+          }
+          for (const special of poke.attacks.special) {
+            if (special.name === "Earthquake") {
+              result.push({
+                id: poke.id,
+                name: poke.name,
+              });
+            }
+          }
+        }
+        body.should.deep.equal(result);
       });
     });
   });
 });
+
+/*
+
+.query({
+  n: 15,
+});
+body.length.should.equal(15);
+
+*/

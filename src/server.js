@@ -83,8 +83,10 @@ const setupServer = () => {
   //////////////////////////////////////
 
   app.get("/api/attacks", (req, res) => {
-    if (req.query.n) res.send(pokeData.attacks.slice(0, req.query.n));
-    else res.send(pokeData.attacks);
+    if (req.query.n) {
+      const allatk = pokeData.attacks.fast.concat(pokeData.attacks.special);
+      res.send(allatk.slice(0, req.query.n));
+    } else res.send(pokeData.attacks);
   });
 
   app.get("/api/attacks/fast", (req, res) => {
@@ -101,6 +103,41 @@ const setupServer = () => {
     } else {
       res.send(pokeData.attacks.special);
     }
+  });
+
+  app.get("/api/attacks/:atkname", (req, res) => {
+    const { atkname } = req.params;
+    pokeData.attacks.fast.forEach((atk) => {
+      if (atk.name === atkname) res.send(atk);
+    });
+    pokeData.attacks.special.forEach((atk) => {
+      if (atk.name === atkname) res.send(atk);
+    });
+  });
+
+  app.get("/api/attacks/:atkname/pokemon", (req, res) => {
+    const { atkname } = req.params;
+    const result = [];
+    const all = pokeData.pokemon;
+    for (const poke of all) {
+      for (const fast of poke.attacks.fast) {
+        if (fast.name === atkname) {
+          result.push({
+            id: poke.id,
+            name: poke.name,
+          });
+        }
+      }
+      for (const special of poke.attacks.special) {
+        if (special.name === atkname) {
+          result.push({
+            id: poke.id,
+            name: poke.name,
+          });
+        }
+      }
+    }
+    res.send(result);
   });
 
   return app;
