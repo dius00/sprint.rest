@@ -25,6 +25,20 @@ describe("Pokemon API Server", () => {
         const { body } = await request.get("/api/pokemon").query({ n: 15 });
         body.length.should.equal(15);
       });
+      it("should return the desired pokemon when the proper id is given as a parameter", async () => {
+        const { body } = await request.get("/api/pokemon/1");
+        body.name.should.equal("Bulbasaur");
+      });
+      it("should return the desired pokemon when the proper name is given as a parameter", async () => {
+        const { body } = await request.get("/api/pokemon/Mew");
+        body.name.should.equal("Mew");
+      });
+
+      it("should return all the evolutions for a pokemon", async () => {
+        const { body } = await request.get("/api/pokemon/staryu/evolutions");
+        console.log(body);
+        body.should.deep.equal([{ id: 121, name: "Starmie" }]);
+      });
     });
     xdescribe("POST", () => {
       it("should return status 418", async () => {
