@@ -5,25 +5,14 @@ const setupServer = () => {
   const app = express();
   app.use(express.json());
 
+  ///////////////////////////////////////////////////
+  ////////POKEMON POKEMON/////////////////////////
+  //////////////////////////////////////////
+
   app.get("/api/pokemon", (req, res) => {
     if (req.query.n) res.send(pokeData.pokemon.slice(0, req.query.n));
     else res.send(pokeData.pokemon);
   });
-
-  // app.use(["/api/pokemon/:value", "/api/pokemon/:value/evolutions"], (req, res, next) => {
-  //   const { value } = req.params;
-  //   if (isNaN(Number(value))) {
-  //     pokeData.pokemon.forEach((poke) => {
-  //       if (poke.name === value) req.pass = poke;
-  //     });
-  //   } else {
-  //     const pokeId = Number(value);
-  //     pokeData.pokemon.forEach((poke) => {
-  //       if (Number(poke.id) === pokeId) req.pass = poke;
-  //     });
-  //   }
-  //   next();
-  // });
 
   app.get("/api/pokemon/:value", (req, res) => {
     const { value } = req.params;
@@ -70,9 +59,9 @@ const setupServer = () => {
     }
   });
 
-  //////////////////////////////
+  ///////////////////////////////////////////////////
   ////////TYPES TYPES/////////////////////////
-  /////////////////////
+  //////////////////////////////////////
 
   app.get("/api/types", (req, res) => {
     if (req.query.n) res.send(pokeData.types.slice(0, req.query.n));
@@ -87,6 +76,15 @@ const setupServer = () => {
       }
     });
     res.send(result);
+  });
+
+  /////////////////////////////////////////////////////
+  ////////ATTACKS ATTACKS/////////////////////////
+  //////////////////////////////////////
+
+  app.get("/api/attacks", (req, res) => {
+    if (req.query.n) res.send(pokeData.attacks.slice(0, req.query.n));
+    else res.send(pokeData.attacks);
   });
 
   return app;

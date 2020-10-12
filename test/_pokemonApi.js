@@ -67,23 +67,6 @@ describe("Pokemon API Server", () => {
       });
     });
   });
-  /*
-    describe("attacks", () => {
-      it("should return the text/html 'world'", async () => {
-        const res = await request.get("/hello");
-        res.should.be.html;
-        res.text.should.equal("world");
-      });
-    });
-
-    describe("types", () => {
-      it("should return the text/html 'world'", async () => {
-        const res = await request.get("/hello");
-        res.should.be.html;
-        res.text.should.equal("world");
-      });
-    });
-*/
 
   describe("types", () => {
     it("should return a list of types", async () => {
@@ -91,6 +74,23 @@ describe("Pokemon API Server", () => {
       body.should.deep.equal(pokeData.types);
     });
     it("should return a list of all pokemon of a certain type", async () => {
+      const { body } = await request.get("/api/types/Grass/pokemon");
+      const res = [];
+      pokeData.pokemon.forEach((poke) => {
+        if (poke.types.includes("Grass")) {
+          res.push({ id: poke.id, name: poke.name });
+        }
+      });
+      body.should.deep.equal(res);
+    });
+  });
+
+  describe("attacks", () => {
+    it("should return a list of all attacks", async () => {
+      const { body } = await request.get("/api/attacks");
+      body.should.deep.equal(pokeData.attacks);
+    });
+    xit("should return a list of n fast attacks", async () => {
       const { body } = await request.get("/api/types/Grass/pokemon");
       const res = [];
       pokeData.pokemon.forEach((poke) => {
