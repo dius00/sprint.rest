@@ -112,6 +112,10 @@ describe("Pokemon API Server", () => {
         const bool = pokeData.types.includes("Onigiri");
         bool.should.be.equal(false);
       });
+      it("should return code 404 if no element is found", async () => {
+        const res = await request.delete("/api/types/999/");
+        res.should.have.status(404);
+      });
     });
     describe("GET", () => {
       it("should return a list of types", async () => {
@@ -175,6 +179,13 @@ describe("Pokemon API Server", () => {
         const lastItem = pokeData.attacks.special.slice(-1)[0];
         lastItem.damage.should.equal(1);
       });
+      it("should return code 404 if no element is found", async () => {
+        const updateAttack = {
+          damage: 1,
+        };
+        const res = await request.patch("/api/attack/999/").send(updateAttack);
+        res.should.have.status(404);
+      });
     });
 
     describe("DELETE", () => {
@@ -197,7 +208,13 @@ describe("Pokemon API Server", () => {
         if (bool === null) bool = false;
         bool.should.be.equal(false);
       });
+
+      it("should return code 404 if no element is found", async () => {
+        const res = await request.delete("/api/attack/999/");
+        res.should.have.status(404);
+      });
     });
+
     describe("GET", () => {
       it("should return a list of all attacks", async () => {
         const { body } = await request.get("/api/attacks");

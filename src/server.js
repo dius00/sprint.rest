@@ -145,8 +145,11 @@ const setupServer = () => {
   app.delete("/api/types/:type", (req, res) => {
     const removeMe = req.params.type;
     const index = pokeData.types.indexOf(removeMe);
-    pokeData.types.splice(index, 1);
-    res.sendStatus(200);
+    if (index === -1) res.sendStatus(404);
+    else {
+      pokeData.types.splice(index, 1);
+      res.sendStatus(200);
+    }
   });
 
   /////////////////////////////////////////////////////
@@ -226,10 +229,11 @@ const setupServer = () => {
   app.patch("/api/attacks/:atkname", (req, res) => {
     const { atkname } = req.params;
     const { body } = req;
-
+    let patched = false;
     function update(attack, updateObj) {
       for (const key of Object.keys(updateObj)) {
         attack[key] = updateObj[key];
+        patched = true;
       }
     }
     pokeData.attacks.fast.forEach((atk) => {
@@ -238,24 +242,27 @@ const setupServer = () => {
     pokeData.attacks.special.forEach((atk) => {
       if (atk.name === atkname) update(atk, body);
     });
-    res.sendStatus(200);
+    patched ? res.sendStatus(200) : res.sendStatus(404);
   });
 
   app.delete("/api/attacks/:atkname", (req, res) => {
     const { atkname } = req.params;
+    let deleted = false;
     pokeData.attacks.fast.forEach((atk) => {
       if (atk.name === atkname) {
         const index = pokeData.attacks.fast.indexOf(atk);
         pokeData.attacks.fast.splice(index, 1);
+        deleted = true;
       }
     });
     pokeData.attacks.special.forEach((atk) => {
       if (atk.name === atkname) {
         const index = pokeData.attacks.special.indexOf(atk);
         pokeData.attacks.special.splice(index, 1);
+        deleted = true;
       }
     });
-    res.sendStatus(200);
+    deleted ? res.sendStatus(200) : res.sendStatus(404);
   });
 
   return app;
