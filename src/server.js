@@ -201,6 +201,18 @@ const setupServer = () => {
     res.send(result);
   });
 
+  app.post("/api/attacks/fast", (req, res) => {
+    const { body } = req;
+    pokeData.attacks.fast.push(body);
+    res.sendStatus(200);
+  });
+
+  app.post("/api/attacks/special", (req, res) => {
+    const { body } = req;
+    pokeData.attacks.special.push(body);
+    res.sendStatus(200);
+  });
+
   return app;
 };
 

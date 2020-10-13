@@ -17,8 +17,7 @@ describe("Pokemon API Server", () => {
   beforeEach(() => {
     request = chai.request(server);
   });
-
-  describe("pokemon", () => {
+  xdescribe("pokemon", () => {
     describe("POST", () => {
       it("should add a pokemon to the list of pokemon", async () => {
         const addPoke = {
@@ -85,118 +84,157 @@ describe("Pokemon API Server", () => {
         });
       });
     });
+  });
 
-    describe("types", () => {
-      describe("POST", () => {
-        it("should add a new Type to the list of Types", async () => {
-          const addType = { types: "Onigiri" };
-          await request.post("/api/types").send(addType);
-          const bool = pokeData.types.includes(addType.types);
-          bool.should.be.equal(true);
-        });
-      });
-      describe("DELETE", () => {
-        it("should DELETE a type from the list of Types", async () => {
-          await request.delete("/api/types/Onigiri");
-          const bool = pokeData.types.includes("Onigiri");
-          bool.should.be.equal(false);
-        });
-      });
-      describe("GET", () => {
-        it("should return a list of types", async () => {
-          const { body } = await request.get("/api/types");
-          body.should.deep.equal(pokeData.types);
-        });
-
-        it("should return a list of all pokemon of a certain type", async () => {
-          const { body } = await request.get("/api/types/Grass/pokemon");
-          const res = [];
-          pokeData.pokemon.forEach((poke) => {
-            if (poke.types.includes("Grass")) {
-              res.push({
-                id: poke.id,
-                name: poke.name,
-              });
-            }
-          });
-          body.should.deep.equal(res);
-        });
+  xdescribe("types", () => {
+    describe("POST", () => {
+      it("should add a new Type to the list of Types", async () => {
+        const addType = { types: "Onigiri" };
+        await request.post("/api/types").send(addType);
+        const bool = pokeData.types.includes(addType.types);
+        bool.should.be.equal(true);
       });
     });
-
-    describe("attacks", () => {
-      describe("GET", () => {
-        it("should return a list of all attacks", async () => {
-          const { body } = await request.get("/api/attacks");
-          body.should.deep.equal(pokeData.attacks);
-        });
+    describe("DELETE", () => {
+      it("should DELETE a type from the list of Types", async () => {
+        await request.delete("/api/types/Onigiri");
+        const bool = pokeData.types.includes("Onigiri");
+        bool.should.be.equal(false);
+      });
+    });
+    describe("GET", () => {
+      it("should return a list of types", async () => {
+        const { body } = await request.get("/api/types");
+        body.should.deep.equal(pokeData.types);
       });
 
-      it("should return A list of all attacks if an an value is given", async () => {
-        const { body } = await request.get("/api/attacks").query({
-          n: 15,
-        });
-        body.length.should.equal(15);
-      });
-
-      it("should return a list of all fast attacks", async () => {
-        const { body } = await request.get("/api/attacks/fast");
-        body.should.deep.equal(pokeData.attacks.fast);
-      });
-
-      it("should return a list of n fast attacks", async () => {
-        const { body } = await request.get("/api/attacks/fast").query({
-          n: 15,
-        });
-        body.length.should.equal(15);
-      });
-
-      it("should return a list of all special attacks", async () => {
-        const { body } = await request.get("/api/attacks/special");
-        body.should.deep.equal(pokeData.attacks.special);
-      });
-
-      it("should return a list of n special attacks", async () => {
-        const { body } = await request.get("/api/attacks/special").query({
-          n: 15,
-        });
-        body.length.should.equal(15);
-      });
-
-      it("should Get a specific attack by name, no matter if it is fast or special", async () => {
-        const { body } = await request.get("/api/attacks/Earthquake");
-        const attack = {
-          name: "Earthquake",
-          type: "Ground",
-          damage: 100,
-        };
-        body.should.deep.equal(attack);
-      });
-
-      it("should return a list of all pokemon that have a certain attack", async () => {
-        const { body } = await request.get("/api/attacks/Earthquake/pokemon");
-        const result = [];
-        const all = pokeData.pokemon;
-        for (const poke of all) {
-          for (const fast of poke.attacks.fast) {
-            if (fast.name === "Earthquake") {
-              result.push({
-                id: poke.id,
-                name: poke.name,
-              });
-            }
+      it("should return a list of all pokemon of a certain type", async () => {
+        const { body } = await request.get("/api/types/Grass/pokemon");
+        const res = [];
+        pokeData.pokemon.forEach((poke) => {
+          if (poke.types.includes("Grass")) {
+            res.push({
+              id: poke.id,
+              name: poke.name,
+            });
           }
-          for (const special of poke.attacks.special) {
-            if (special.name === "Earthquake") {
-              result.push({
-                id: poke.id,
-                name: poke.name,
-              });
-            }
-          }
-        }
-        body.should.deep.equal(result);
+        });
+        body.should.deep.equal(res);
       });
     });
   });
+
+  describe("attacks", () => {
+    describe("POST", () => {
+      it("should add a new attack to fast attacks", async () => {
+        const attack = {
+          name: "Chrysalize",
+          type: "Bug",
+          damage: 15,
+        };
+        await request.post("/api/attacks/fast").send(attack);
+        const lastItem = pokeData.attacks.fast.slice(-1)[0];
+        lastItem.should.deep.equal(attack);
+      });
+      it("should add a new attack to special attacks", async () => {
+        const attack = {
+          name: "JS-Error",
+          type: "Unhandeld Exception",
+          damage: 999,
+        };
+        await request.post("/api/attacks/special").send(attack);
+        const lastItem = pokeData.attacks.special.slice(-1)[0];
+        lastItem.should.deep.equal(attack);
+      });
+    });
+    // describe("PATCH", () => {
+    //   it("should update an attack", async () => {
+    //     const addPoke = {
+    //       id: "205",
+    //     };
+    //     await request.patch("/api/pokemon/200/").send(addPoke);
+    //     pokeData.pokemon[151].id.should.equal("205");
+    //   });
+    // });
+    // describe("DELETE", () => {
+    //   it("should DELETE an attack from the list", async () => {
+    //     await request.delete("/api/types/Onigiri");
+    //     const bool = pokeData.types.includes("Onigiri");
+    //     bool.should.be.equal(false);
+    //   });
+    // });
+    xdescribe("GET", () => {
+      it("should return a list of all attacks", async () => {
+        const { body } = await request.get("/api/attacks");
+        body.should.deep.equal(pokeData.attacks);
+      });
+    });
+
+    it("should return A list of all attacks if an an value is given", async () => {
+      const { body } = await request.get("/api/attacks").query({
+        n: 15,
+      });
+      body.length.should.equal(15);
+    });
+
+    it("should return a list of all fast attacks", async () => {
+      const { body } = await request.get("/api/attacks/fast");
+      body.should.deep.equal(pokeData.attacks.fast);
+    });
+
+    it("should return a list of n fast attacks", async () => {
+      const { body } = await request.get("/api/attacks/fast").query({
+        n: 15,
+      });
+      body.length.should.equal(15);
+    });
+
+    it("should return a list of all special attacks", async () => {
+      const { body } = await request.get("/api/attacks/special");
+      body.should.deep.equal(pokeData.attacks.special);
+    });
+
+    it("should return a list of n special attacks", async () => {
+      const { body } = await request.get("/api/attacks/special").query({
+        n: 15,
+      });
+      body.length.should.equal(15);
+    });
+
+    it("should Get a specific attack by name, no matter if it is fast or special", async () => {
+      const { body } = await request.get("/api/attacks/Earthquake");
+      const attack = {
+        name: "Earthquake",
+        type: "Ground",
+        damage: 100,
+      };
+      body.should.deep.equal(attack);
+    });
+
+    it("should return a list of all pokemon that have a certain attack", async () => {
+      const { body } = await request.get("/api/attacks/Earthquake/pokemon");
+      const result = [];
+      const all = pokeData.pokemon;
+      for (const poke of all) {
+        for (const fast of poke.attacks.fast) {
+          if (fast.name === "Earthquake") {
+            result.push({
+              id: poke.id,
+              name: poke.name,
+            });
+          }
+        }
+        for (const special of poke.attacks.special) {
+          if (special.name === "Earthquake") {
+            result.push({
+              id: poke.id,
+              name: poke.name,
+            });
+          }
+        }
+      }
+      body.should.deep.equal(result);
+    });
+  });
 });
+//});
