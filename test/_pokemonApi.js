@@ -19,80 +19,105 @@ describe("Pokemon API Server", () => {
   });
 
   describe("pokemon", () => {
-    describe("GET", () => {
-      it("should return a list of all pokemon", async () => {
-        const { body } = await request.get("/api/pokemon");
-        body.length.should.equal(151);
+    describe("POST", () => {
+      it("should add a pokemon to the list of pokemon", async () => {
+        const addPoke = {
+          id: "200",
+          name: "Weird",
+        };
+        await request.post("/api/pokemon").send(addPoke);
+        pokeData.pokemon[151].should.deep.equal(addPoke);
       });
-      it("when given a query parameter, it should return a list of n pokemon", async () => {
-        const { body } = await request.get("/api/pokemon").query({
-          n: 15,
+      describe("PATCH", () => {
+        it("should update a pokemon object", async () => {
+          const addPoke = {
+            id: "205",
+          };
+          await request.patch("/api/pokemon/200/").send(addPoke);
+          pokeData.pokemon[151].id.should.equal("205");
         });
-        body.length.should.equal(15);
       });
-      it("should return the desired pokemon when the proper id is given as a parameter", async () => {
-        const { body } = await request.get("/api/pokemon/1");
-        body.name.should.equal("Bulbasaur");
+      describe("DELETE", () => {
+        it("should DELETE a pokemon object", async () => {
+          await request.delete("/api/pokemon/205/");
+          pokeData.pokemon.length.should.equal(151);
+        });
       });
-      it("should return the desired pokemon when the proper name is given as a parameter", async () => {
-        const { body } = await request.get("/api/pokemon/Mew");
-        body.name.should.equal("Mew");
-      });
+      describe("GET", () => {
+        it("should return a list of all pokemon", async () => {
+          const { body } = await request.get("/api/pokemon");
+          body.length.should.equal(151);
+        });
+        it("when given a query parameter, it should return a list of n pokemon", async () => {
+          const { body } = await request.get("/api/pokemon").query({
+            n: 15,
+          });
+          body.length.should.equal(15);
+        });
+        it("should return the desired pokemon when the proper id is given as a parameter", async () => {
+          const { body } = await request.get("/api/pokemon/1");
+          body.name.should.equal("Bulbasaur");
+        });
+        it("should return the desired pokemon when the proper name is given as a parameter", async () => {
+          const { body } = await request.get("/api/pokemon/Mew");
+          body.name.should.equal("Mew");
+        });
 
-      it("should return all the evolutions for a pokemon", async () => {
-        const { body } = await request.get("/api/pokemon/staryu/evolutions");
-        body.should.deep.equal([
-          {
-            id: 121,
-            name: "Starmie",
-          },
-        ]);
-      });
-      it("should return the previous evolution of a pokemon", async () => {
-        const { body } = await request.get(
-          "/api/pokemon/17/evolutions/previous"
-        );
-        body.should.deep.equal([
-          {
-            id: 16,
-            name: "Pidgey",
-          },
-        ]);
+        it("should return all the evolutions for a pokemon", async () => {
+          const { body } = await request.get("/api/pokemon/staryu/evolutions");
+          body.should.deep.equal([
+            {
+              id: 121,
+              name: "Starmie",
+            },
+          ]);
+        });
+        it("should return the previous evolution of a pokemon", async () => {
+          const { body } = await request.get(
+            "/api/pokemon/17/evolutions/previous"
+          );
+          body.should.deep.equal([
+            {
+              id: 16,
+              name: "Pidgey",
+            },
+          ]);
+        });
       });
     });
-  });
 
-  describe("types", () => {
-    describe("GET", () => {
-      it("should return a list of types", async () => {
-        const { body } = await request.get("/api/types");
-        body.should.deep.equal(pokeData.types);
-      });
-
-      it("should return a list of all pokemon of a certain type", async () => {
-        const { body } = await request.get("/api/types/Grass/pokemon");
-        const res = [];
-        pokeData.pokemon.forEach((poke) => {
-          if (poke.types.includes("Grass")) {
-            res.push({
-              id: poke.id,
-              name: poke.name,
-            });
-          }
+    describe("types", () => {
+      describe("GET", () => {
+        it("should return a list of types", async () => {
+          const { body } = await request.get("/api/types");
+          body.should.deep.equal(pokeData.types);
         });
-        body.should.deep.equal(res);
+
+        it("should return a list of all pokemon of a certain type", async () => {
+          const { body } = await request.get("/api/types/Grass/pokemon");
+          const res = [];
+          pokeData.pokemon.forEach((poke) => {
+            if (poke.types.includes("Grass")) {
+              res.push({
+                id: poke.id,
+                name: poke.name,
+              });
+            }
+          });
+          body.should.deep.equal(res);
+        });
       });
     });
-  });
 
-  describe("attacks", () => {
-    describe("GET", () => {
-      it("should return a list of all attacks", async () => {
-        const { body } = await request.get("/api/attacks");
-        body.should.deep.equal(pokeData.attacks);
+    describe("attacks", () => {
+      describe("GET", () => {
+        it("should return a list of all attacks", async () => {
+          const { body } = await request.get("/api/attacks");
+          body.should.deep.equal(pokeData.attacks);
+        });
       });
 
-      it("should return an n list of all attacks if an an value is given", async () => {
+      it("should return A list of all attacks if an an value is given", async () => {
         const { body } = await request.get("/api/attacks").query({
           n: 15,
         });
@@ -133,7 +158,7 @@ describe("Pokemon API Server", () => {
         body.should.deep.equal(attack);
       });
 
-      it("should return a list of all pokemon of that have a certain attack", async () => {
+      it("should return a list of all pokemon that have a certain attack", async () => {
         const { body } = await request.get("/api/attacks/Earthquake/pokemon");
         const result = [];
         const all = pokeData.pokemon;
@@ -160,12 +185,3 @@ describe("Pokemon API Server", () => {
     });
   });
 });
-
-/*
-
-.query({
-  n: 15,
-});
-body.length.should.equal(15);
-
-*/

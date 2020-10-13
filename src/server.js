@@ -9,6 +9,54 @@ const setupServer = () => {
   ////////POKEMON POKEMON/////////////////////////
   //////////////////////////////////////////
 
+  app.post("/api/pokemon", (req, res) => {
+    const { body } = req;
+    pokeData.pokemon.push(body);
+    res.sendStatus(200);
+  });
+  app.patch("/api/pokemon/:value", (req, res) => {
+    const { body } = req;
+    const { value } = req.params;
+
+    function update(pokemon, updateObj) {
+      for (const key of Object.keys(updateObj)) {
+        pokemon[key] = updateObj[key];
+      }
+    }
+    if (isNaN(Number(value))) {
+      pokeData.pokemon.forEach((poke) => {
+        if (poke.name.toLowerCase() === value.toLowerCase()) update(poke, body);
+      });
+    } else {
+      const pokeId = Number(value);
+      pokeData.pokemon.forEach((poke) => {
+        if (Number(poke.id) === pokeId) update(poke, body);
+      });
+    }
+    res.sendStatus(200);
+  });
+
+  app.delete("/api/pokemon/:value", (req, res) => {
+    const { value } = req.params;
+    if (isNaN(Number(value))) {
+      pokeData.pokemon.forEach((poke) => {
+        if (poke.name.toLowerCase() === value.toLowerCase()) {
+          const spliceIndex = pokeData.pokemon.indexOf(poke);
+          pokeData.pokemon.splice(spliceIndex, 1);
+        }
+      });
+    } else {
+      const pokeId = Number(value);
+      pokeData.pokemon.forEach((poke) => {
+        if (Number(poke.id) === pokeId) {
+          const spliceIndex = pokeData.pokemon.indexOf(poke);
+          pokeData.pokemon.splice(spliceIndex, 1);
+        }
+      });
+    }
+    res.sendStatus(200);
+  });
+
   app.get("/api/pokemon", (req, res) => {
     if (req.query.n) res.send(pokeData.pokemon.slice(0, req.query.n));
     else res.send(pokeData.pokemon);
