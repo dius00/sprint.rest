@@ -32,14 +32,25 @@ describe("Pokemon API Server", () => {
           const addPoke = {
             id: "205",
           };
-          await request.patch("/api/pokemon/200/").send(addPoke);
+          await request.patch("/api/pokemon/200").send(addPoke);
           pokeData.pokemon[151].id.should.equal("205");
+        });
+        it("should return code 400 if no element is found", async () => {
+          const addPoke = {
+            id: "205",
+          };
+          const res = await request.patch("/api/pokemon/999/").send(addPoke);
+          res.should.have.status(400);
         });
       });
       describe("DELETE", () => {
         it("should DELETE a pokemon object", async () => {
           await request.delete("/api/pokemon/205/");
           pokeData.pokemon.length.should.equal(151);
+        });
+        it("should return code 400 if no element is found", async () => {
+          const res = await request.delete("/api/pokemon/999/");
+          res.should.have.status(400);
         });
       });
       describe("GET", () => {

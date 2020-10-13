@@ -18,7 +18,7 @@ const setupServer = () => {
   app.patch("/api/pokemon/:value", (req, res) => {
     const { body } = req;
     const { value } = req.params;
-
+    let patched = false;
     function update(pokemon, updateObj) {
       for (const key of Object.keys(updateObj)) {
         pokemon[key] = updateObj[key];
@@ -26,24 +26,32 @@ const setupServer = () => {
     }
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
-        if (poke.name.toLowerCase() === value.toLowerCase()) update(poke, body);
+        if (poke.name.toLowerCase() === value.toLowerCase()) {
+          update(poke, body);
+          patched = true;
+        }
       });
     } else {
       const pokeId = Number(value);
       pokeData.pokemon.forEach((poke) => {
-        if (Number(poke.id) === pokeId) update(poke, body);
+        if (Number(poke.id) === pokeId) {
+          update(poke, body);
+          patched = true;
+        }
       });
     }
-    res.sendStatus(200);
+    patched ? res.sendStatus(200) : res.sendStatus(400);
   });
 
   app.delete("/api/pokemon/:value", (req, res) => {
     const { value } = req.params;
+    let removed = false;
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
         if (poke.name.toLowerCase() === value.toLowerCase()) {
           const spliceIndex = pokeData.pokemon.indexOf(poke);
           pokeData.pokemon.splice(spliceIndex, 1);
+          removed = true;
         }
       });
     } else {
@@ -52,10 +60,11 @@ const setupServer = () => {
         if (Number(poke.id) === pokeId) {
           const spliceIndex = pokeData.pokemon.indexOf(poke);
           pokeData.pokemon.splice(spliceIndex, 1);
+          removed = true;
         }
       });
     }
-    res.sendStatus(200);
+    removed ? res.sendStatus(200) : res.sendStatus(400);
   });
 
   app.get("/api/pokemon", (req, res) => {
