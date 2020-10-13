@@ -126,6 +126,19 @@ const setupServer = () => {
     res.send(result);
   });
 
+  app.post("/api/types", (req, res) => {
+    const { body } = req;
+    pokeData.types.push(body.types);
+    res.sendStatus(200);
+  });
+
+  app.delete("/api/types/:type", (req, res) => {
+    const removeMe = req.params.type;
+    const index = pokeData.types.indexOf(removeMe);
+    pokeData.types.splice(index, 1);
+    res.sendStatus(200);
+  });
+
   /////////////////////////////////////////////////////
   ////////ATTACKS ATTACKS/////////////////////////
   //////////////////////////////////////

@@ -87,6 +87,21 @@ describe("Pokemon API Server", () => {
     });
 
     describe("types", () => {
+      describe("POST", () => {
+        it("should add a new Type to the list of Types", async () => {
+          const addType = { types: "Onigiri" };
+          await request.post("/api/types").send(addType);
+          const bool = pokeData.types.includes(addType.types);
+          bool.should.be.equal(true);
+        });
+      });
+      describe("DELETE", () => {
+        it("should DELETE a type from the list of Types", async () => {
+          await request.delete("/api/types/Onigiri");
+          const bool = pokeData.types.includes("Onigiri");
+          bool.should.be.equal(false);
+        });
+      });
       describe("GET", () => {
         it("should return a list of types", async () => {
           const { body } = await request.get("/api/types");
