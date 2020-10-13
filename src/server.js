@@ -68,53 +68,86 @@ const setupServer = () => {
   });
 
   app.get("/api/pokemon", (req, res) => {
-    if (req.query.n) res.send(pokeData.pokemon.slice(0, req.query.n));
-    else res.send(pokeData.pokemon);
+    if (req.query.n) {
+      const limit = Number(req.query.n);
+      if (limit < 1 || isNaN(limit)) {
+        res.sendStatus(406);
+      } else if (limit <= pokeData.pokemon.length) {
+        res.send(pokeData.pokemon.slice(0, limit));
+      }
+    } else res.send(pokeData.pokemon);
   });
 
   app.get("/api/pokemon/:value", (req, res) => {
     const { value } = req.params;
+    let found = false;
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
-        if (poke.name.toLowerCase() === value.toLowerCase()) res.send(poke);
+        if (poke.name.toLowerCase() === value.toLowerCase()) {
+          res.send(poke);
+          found = true;
+        }
       });
     } else {
       const pokeId = Number(value);
       pokeData.pokemon.forEach((poke) => {
-        if (Number(poke.id) === pokeId) res.send(poke);
+        if (Number(poke.id) === pokeId) {
+          res.send(poke);
+          found = true;
+        }
       });
     }
+    if (!found) res.sendStatus(404);
   });
 
   app.get("/api/pokemon/:value/evolutions", (req, res) => {
     const { value } = req.params;
+    let found = false;
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
-        if (poke.name.toLowerCase() === value.toLowerCase())
-          res.send(poke.evolutions);
+        if (poke.name.toLowerCase() === value.toLowerCase()) {
+          found = true;
+          if (poke.evolutions) res.send(poke.evolutions);
+          else res.send([]);
+        }
       });
     } else {
       const pokeId = Number(value);
       pokeData.pokemon.forEach((poke) => {
-        if (Number(poke.id) === pokeId) res.send(poke.evolutions);
+        if (Number(poke.id) === pokeId) {
+          found = true;
+          if (poke.evolutions) res.send(poke.evolutions);
+          else res.send([]);
+        }
       });
     }
+    if (!found) res.sendStatus(404);
   });
 
   app.get("/api/pokemon/:value/evolutions/previous", (req, res) => {
     const { value } = req.params;
+    let found = false;
     if (isNaN(Number(value))) {
       pokeData.pokemon.forEach((poke) => {
-        if (poke.name.toLowerCase() === value.toLowerCase())
-          res.send(poke["Previous evolution(s)"].slice(-1));
+        if (poke.name.toLowerCase() === value.toLowerCase()) {
+          found = true;
+          if (poke["Previous evolution(s)"]) {
+            res.send(poke["Previous evolution(s)"].slice(-1));
+          } else res.send([]);
+        }
       });
     } else {
       const pokeId = Number(value);
       pokeData.pokemon.forEach((poke) => {
-        if (Number(poke.id) === pokeId)
-          res.send(poke["Previous evolution(s)"].slice(-1));
+        if (Number(poke.id) === pokeId) {
+          found = true;
+          if (poke["Previous evolution(s)"]) {
+            res.send(poke["Previous evolution(s)"].slice(-1));
+          } else res.send([]);
+        }
       });
     }
+    if (!found) res.sendStatus(404);
   });
 
   ///////////////////////////////////////////////////

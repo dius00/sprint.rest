@@ -64,6 +64,12 @@ describe("Pokemon API Server", () => {
           });
           body.length.should.equal(15);
         });
+        it("when given a bad query, it should return status 406", async () => {
+          const res = await request.get("/api/pokemon").query({
+            n: -1,
+          });
+          res.should.have.status(406);
+        });
         it("should return the desired pokemon when the proper id is given as a parameter", async () => {
           const { body } = await request.get("/api/pokemon/1");
           body.name.should.equal("Bulbasaur");
@@ -71,6 +77,10 @@ describe("Pokemon API Server", () => {
         it("should return the desired pokemon when the proper name is given as a parameter", async () => {
           const { body } = await request.get("/api/pokemon/Mew");
           body.name.should.equal("Mew");
+        });
+        it("when given a bad parameter, it should return status 404", async () => {
+          const res = await request.get("/api/pokemon/AzabuPidgey");
+          res.should.have.status(404);
         });
 
         it("should return all the evolutions for a pokemon", async () => {
@@ -82,6 +92,15 @@ describe("Pokemon API Server", () => {
             },
           ]);
         });
+
+        it("should return an empty array for pokemon with no evolutions", async () => {
+          const { body } = await request.get("/api/pokemon/mew/evolutions");
+          body.should.deep.equal([]);
+        });
+        it("when given a bad parameter, it should return status 404", async () => {
+          const res = await request.get("/api/pokemon/AzabuPidgey/evolutions");
+          res.should.have.status(404);
+        });
         it("should return the previous evolution of a pokemon", async () => {
           const { body } = await request.get(
             "/api/pokemon/17/evolutions/previous"
@@ -92,6 +111,19 @@ describe("Pokemon API Server", () => {
               name: "Pidgey",
             },
           ]);
+        });
+        it("should return an empty array when the pokemon has no previous evolution", async () => {
+          const { body } = await request.get(
+            "/api/pokemon/Charmander/evolutions/previous"
+          );
+          body.should.deep.equal([]);
+        });
+
+        it("when given a bad parameter, it should return status 404", async () => {
+          const res = await request.get(
+            "/api/pokemon/AzabuPidgey/evolutions/previous"
+          );
+          res.should.have.status(404);
         });
       });
     });
