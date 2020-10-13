@@ -154,6 +154,18 @@ describe("Pokemon API Server", () => {
         const { body } = await request.get("/api/types");
         body.should.deep.equal(pokeData.types);
       });
+      it("when given a query parameter, it should return a list of n pokemon", async () => {
+        const { body } = await request.get("/api/types").query({
+          n: 5,
+        });
+        body.length.should.equal(5);
+      });
+      it("when given a query parameter, should return 406 if not valid limit", async () => {
+        const res = await request.get("/api/types").query({
+          n: -1,
+        });
+        res.should.have.status(406);
+      });
 
       it("should return a list of all pokemon of a certain type", async () => {
         const { body } = await request.get("/api/types/Grass/pokemon");
@@ -168,9 +180,12 @@ describe("Pokemon API Server", () => {
         });
         body.should.deep.equal(res);
       });
+      it("should return 404 if the selected type does not exit", async () => {
+        const res = await request.get("/api/types/Javascript/pokemon");
+        res.should.have.status(404);
+      });
     });
   });
-
   describe("attacks", () => {
     describe("POST", () => {
       it("should add a new attack to fast attacks", async () => {
@@ -253,11 +268,17 @@ describe("Pokemon API Server", () => {
         body.should.deep.equal(pokeData.attacks);
       });
 
-      it("should return A list of all attacks if an an value is given", async () => {
+      it("should return a list of all attacks if a value is given", async () => {
         const { body } = await request.get("/api/attacks").query({
           n: 15,
         });
         body.length.should.equal(15);
+      });
+      it("should return 406 if the query paramter is invalid", async () => {
+        const res = await request.get("/api/attacks").query({
+          n: -15,
+        });
+        res.should.have.status(406);
       });
 
       it("should return a list of all fast attacks", async () => {

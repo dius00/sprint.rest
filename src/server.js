@@ -155,18 +155,26 @@ const setupServer = () => {
   //////////////////////////////////////
 
   app.get("/api/types", (req, res) => {
-    if (req.query.n) res.send(pokeData.types.slice(0, req.query.n));
-    else res.send(pokeData.types);
+    if (req.query.n) {
+      const limit = Number(req.query.n);
+      if (limit < 1 || isNaN(limit)) {
+        res.sendStatus(406);
+      } else if (limit <= pokeData.types.length) {
+        res.send(pokeData.types.slice(0, limit));
+      }
+    } else res.send(pokeData.types);
   });
 
   app.get("/api/types/:type/pokemon", (req, res) => {
     const result = [];
-    pokeData.pokemon.forEach((poke) => {
-      if (poke.types.includes(req.params.type)) {
-        result.push({ id: poke.id, name: poke.name });
-      }
-    });
-    res.send(result);
+    if (pokeData.types.includes(req.params.type)) {
+      pokeData.pokemon.forEach((poke) => {
+        if (poke.types.includes(req.params.type)) {
+          result.push({ id: poke.id, name: poke.name });
+        }
+      });
+      res.send(result);
+    } else res.sendStatus(404);
   });
 
   app.post("/api/types", (req, res) => {
@@ -190,9 +198,14 @@ const setupServer = () => {
   //////////////////////////////////////
 
   app.get("/api/attacks", (req, res) => {
+    const allatk = pokeData.attacks.fast.concat(pokeData.attacks.special);
     if (req.query.n) {
-      const allatk = pokeData.attacks.fast.concat(pokeData.attacks.special);
-      res.send(allatk.slice(0, req.query.n));
+      const limit = Number(req.query.n);
+      if (limit < 1 || isNaN(limit)) {
+        res.sendStatus(406);
+      } else if (limit <= allatk.length) {
+        res.send(allatk.slice(0, limit));
+      }
     } else res.send(pokeData.attacks);
   });
 
