@@ -14,6 +14,7 @@ const setupServer = () => {
     pokeData.pokemon.push(body);
     res.sendStatus(200);
   });
+
   app.patch("/api/pokemon/:value", (req, res) => {
     const { body } = req;
     const { value } = req.params;
@@ -210,6 +211,41 @@ const setupServer = () => {
   app.post("/api/attacks/special", (req, res) => {
     const { body } = req;
     pokeData.attacks.special.push(body);
+    res.sendStatus(200);
+  });
+
+  app.patch("/api/attacks/:atkname", (req, res) => {
+    const { atkname } = req.params;
+    const { body } = req;
+
+    function update(attack, updateObj) {
+      for (const key of Object.keys(updateObj)) {
+        attack[key] = updateObj[key];
+      }
+    }
+    pokeData.attacks.fast.forEach((atk) => {
+      if (atk.name === atkname) update(atk, body);
+    });
+    pokeData.attacks.special.forEach((atk) => {
+      if (atk.name === atkname) update(atk, body);
+    });
+    res.sendStatus(200);
+  });
+
+  app.delete("/api/attacks/:atkname", (req, res) => {
+    const { atkname } = req.params;
+    pokeData.attacks.fast.forEach((atk) => {
+      if (atk.name === atkname) {
+        const index = pokeData.attacks.fast.indexOf(atk);
+        pokeData.attacks.fast.splice(index, 1);
+      }
+    });
+    pokeData.attacks.special.forEach((atk) => {
+      if (atk.name === atkname) {
+        const index = pokeData.attacks.special.indexOf(atk);
+        pokeData.attacks.special.splice(index, 1);
+      }
+    });
     res.sendStatus(200);
   });
 
